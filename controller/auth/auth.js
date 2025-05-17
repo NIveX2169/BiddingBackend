@@ -100,13 +100,13 @@ router.post("/login", async (req, res) => {
       secure: isProduction,
       maxAge: 1000 * 60 * 60 * 24 * 30, // 15 minutes
       httpOnly: true,
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: isProduction ? "none" : "lax",
     });
     res.cookie("refreshToken", refreshToken, {
       secure: isProduction,
       maxAge: 1000 * 60 * 60 * 24 * 30, // 7 days
       httpOnly: true,
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: isProduction ? "none" : "lax",
     });
 
     res.json({
