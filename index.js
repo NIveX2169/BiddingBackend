@@ -46,6 +46,7 @@ const io = new Server(server, {
       "http://localhost:3000",
       "http://localhost:5173",
       "https://bidding-frontend-hggx.vercel.app",
+      "https://bidding-frontend-kappa.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
