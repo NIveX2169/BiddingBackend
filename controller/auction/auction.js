@@ -83,7 +83,7 @@ export const createAuction = async (req, res) => {
 // --- UPDATE AUCTION ---
 export const updateAuction = async (req, res) => {
   try {
-    const { userId } = req; // From auth middleware
+    const { user } = req; // From auth middleware
     const { auctionId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(auctionId)) {
@@ -101,8 +101,7 @@ export const updateAuction = async (req, res) => {
     }
 
     // Authorization: Only the creator can update (or an admin, if you add that role check)
-    if (auction.createdBy.toString() !== userId) {
-      // Add admin check: && req.userRole !== 'admin'
+    if (auction.createdBy.toString() !== user.id) {
       return res.status(403).json({
         status: false,
         message: "Unauthorized: You cannot update this auction.",
@@ -142,7 +141,6 @@ export const updateAuction = async (req, res) => {
       }
     }
 
-    // Fields that can be updated
     const {
       title,
       description,
@@ -188,10 +186,8 @@ export const updateAuction = async (req, res) => {
       updateData.endTime = new Date(endTime);
     }
     if (status) {
-      // Be careful with status changes, may need specific logic
-      // Example: allow admin to cancel or manually end
       if (
-        req.userRole === "admin" ||
+        req.user.role === "admin" ||
         (status === "cancelled" &&
           auction.status !== "ended" &&
           auction.status !== "sold")

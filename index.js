@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:3000", "http://localhost:5173"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
 );
@@ -48,7 +48,6 @@ io.use(socketAuthMiddleware);
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 
-  // --- Handle joining and leaving auction rooms ---
   socket.on("joinAuctionRoom", (auctionId) => {
     if (!auctionId) return;
     const roomName = `auction-${auctionId}`;

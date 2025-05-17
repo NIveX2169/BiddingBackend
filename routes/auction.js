@@ -5,6 +5,7 @@ import {
   getAllAuctions,
   getAllAuctionsByUser,
   getAuctionById,
+  updateAuction,
 } from "../controller/auction/auction.js";
 import { verifyToken } from "../middleware/verifyTokenMiddleware.js";
 
@@ -13,6 +14,10 @@ router.route("/get-specific-auctions").get(verifyToken, getAllAuctionsByUser);
 
 router.route("/").post(createAuction).get(verifyToken, getAllAuctions);
 
-router.route("/:auctionId").get(getAuctionById).delete(deleteAuction);
+router
+  .route("/:auctionId")
+  .get(getAuctionById)
+  .delete(deleteAuction)
+  .patch(verifyToken, updateAuction);
 
 export const AuctionRoutes = router;

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendVerificationEmail } from "../../utils/sendMail.js";
+import { verifyToken } from "../../middleware/verifyTokenMiddleware.js";
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.post("/register", async (req, res) => {
     res.status(201).json({
       status: true,
       message:
-        "User registered successfully. Please Check Your Email For Verification Link.",
+        "User registered successfully. Please Check Your Email For Verification Link. Check Spam Also!!",
     });
   } catch (error) {
     console.error(error.message);
@@ -185,6 +186,67 @@ router.post("/resend-verification", async (req, res) => {
     console.error(error.message);
     res.status(500).json({ status: false, message: "Server Error" });
   }
+});
+
+router.get("/logout", (req, res) => {
+  try {
+    // Clear the cookie that stores the JWT token
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // only in HTTPS
+      sameSite: "strict",
+    });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // only in HTTPS
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout Error: ", error.message);
+    res.status(500).json({
+      status: false,
+      message: "Server Error during logout",
+    });
+  }
+});
+
+router.route("/getAllUser").get(verifyToken, async (req, res) => {
+  if (req.user.role != "ADMIN") {
+    return res
+      .status(401)
+      .json({ status: false, message: "Unauthorized Path !!" });
+  }
+  console.log("huraah");
+  const users = await UserModel.find()
+    .select(
+      "-password -isVerified -refreshToken -verificationTokenExpires -verificationToken"
+    )
+    .lean();
+
+  return res
+    .status(200)
+    .json({ status: true, message: "Fetched All Users", data: users });
+});
+
+router.patch("/assign-role/:id", verifyToken, async (req, res) => {
+  if (req.user.role != "ADMIN") {
+    return res
+      .status(401)
+      .json({ status: false, message: "Unauthorized Path !!" });
+  }
+
+  const { id } = req.params;
+  const { role } = req.body;
+  const users = await UserModel.findByIdAndUpdate(id, {
+    role,
+  });
+
+  return res.status(200).json({ status: true, message: "User Role Assigned" });
 });
 
 export const UserAuthRoutes = router;
