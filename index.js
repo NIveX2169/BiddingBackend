@@ -22,7 +22,11 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://bidding-frontend-hggx.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
@@ -38,7 +42,11 @@ app.use("/api/v1/auction", AuctionRoutes);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://bidding-frontend-hggx.vercel.app",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
